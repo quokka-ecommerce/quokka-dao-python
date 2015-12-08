@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
 
+from product_unit import ProductUnit
+from product_review import ProductReview
 
 class ProductDetail(object):
 
@@ -29,14 +32,35 @@ class ProductDetail(object):
         if field is None:
             raise ValueError(field_name + " should not be None")
 
-    def validate_input(self):
+    def validate(self):
         ProductDetail.not_none(self._id, "id")
         ProductDetail.not_none(self.product_name, "product name")
         ProductDetail.not_none(self.category_l1, "category l1")
         ProductDetail.not_none(self.category_l2, "category l2")
         ProductDetail.not_none(self.category_l3, "category l3")
+        ProductDetail.not_none(self.original_country, "original country")
         ProductDetail.not_none(self.product_unit, "prodcut unit")
         ProductDetail.not_none(self.brand, "brand")
+        ProductDetail.not_none(self.current_stock, "current stock")
+        ProductDetail.not_none(self.current_price, "current_price")
+        ProductDetail.not_none(self.image_link, "image_link")
+
+        if not isinstance(self.product_unit, ProductUnit):
+            raise TypeError("product unit should be ProductUnit Type")
+
+        if not isinstance(self.attributes, list):
+            raise TypeError("attributes should be a list")
+
+        for item in self.attributes:
+            if not isinstance(item, dict):
+                raise TypeError("attribute should be a dict")
+
+        if not isinstance(self.reviews, list):
+            raise TypeError("reviews should be list")
+
+        for item in self.reviews:
+            if not isinstance(item, ProductReview):
+                raise TypeError("review should be a ProductReview")
 
 
 if __name__ == "__main__":

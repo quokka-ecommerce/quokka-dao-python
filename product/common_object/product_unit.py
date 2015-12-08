@@ -1,4 +1,5 @@
-from enum import Enum
+# -*- coding: utf-8 -*-
+
 from unit_type import UnitType
 
 
