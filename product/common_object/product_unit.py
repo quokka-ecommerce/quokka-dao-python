@@ -26,6 +26,12 @@ class ProductUnit(object):
     def __repr__(self):
         return "unit_type: " + self.unit_type.value + ", unit_number: " + str(self.unit_number)
 
+    @staticmethod
+    def dummy():
+        dummy_type = UnitType.BAG
+        dummy_number = 1
+        return ProductUnit(dummy_type, dummy_number)
+
 
 if __name__ == "__main__":
     t = UnitType.BAG

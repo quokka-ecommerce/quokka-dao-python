@@ -26,11 +26,38 @@ class ProductDetail(object):
         self.sale_history_id = sale_history_id
         self.history_price = history_price
         self.reviews = reviews
+        self.validate()
 
     @staticmethod
     def not_none(field, field_name):
         if field is None:
             raise ValueError(field_name + " should not be None")
+
+    @staticmethod
+    def instance_check(field, field_name, field_type):
+        if field is None:
+            return
+        if not isinstance(field, field_type):
+            string = "{0} should be type of {1}"
+            raise TypeError(string.format(field_name, field_type))
+
+    @staticmethod
+    def dummy():
+        dummy_attribute = {
+            "core": 4,
+            "cpu": "i5"
+        }
+        dummy_unit = ProductUnit.dummy()
+        dummy_review = ProductReview.dummy()
+        return ProductDetail(
+            1L,
+            "dummy",
+            123456L,
+            "l1", "l2", "l3",
+            dummy_unit, "apple", "china", dummy_attribute,
+            13.2, 12, "http://image.com", "good product",
+            123L, 234L, 345L, [dummy_review, dummy_review]
+        )
 
     def validate(self):
         ProductDetail.not_none(self._id, "id")
@@ -45,23 +72,46 @@ class ProductDetail(object):
         ProductDetail.not_none(self.current_price, "current_price")
         ProductDetail.not_none(self.image_link, "image_link")
 
-        if not isinstance(self.product_unit, ProductUnit):
-            raise TypeError("product unit should be ProductUnit Type")
+        ProductDetail.instance_check(self.upc, "upc", long)
+        ProductDetail.instance_check(self._id, "id", long)
+        ProductDetail.instance_check(self.vendor_id, "vendor", long)
+        ProductDetail.instance_check(self.sale_history_id, "sale history", long)
+        ProductDetail.instance_check(self.history_price, "history price", long)
+        ProductDetail.instance_check(self.product_unit, "product_unit", ProductUnit)
+        ProductDetail.instance_check(self.category_l1, "l1 category", str)
+        ProductDetail.instance_check(self.category_l2, "l2 category", str)
+        ProductDetail.instance_check(self.category_l3, "l3 category", str)
 
-        if not isinstance(self.attributes, list):
-            raise TypeError("attributes should be a list")
 
-        for item in self.attributes:
-            if not isinstance(item, dict):
-                raise TypeError("attribute should be a dict")
-
-        if not isinstance(self.reviews, list):
-            raise TypeError("reviews should be list")
-
+        ProductDetail.instance_check(self.attributes, "product attributes", dict)
+        ProductDetail.instance_check(self.reviews, "reviews", list)
         for item in self.reviews:
-            if not isinstance(item, ProductReview):
-                raise TypeError("review should be a ProductReview")
+            ProductDetail.instance_check(item, "review", ProductReview)
+
+    def __dict__(self):
+        current_dict = {
+            "id": self._id,
+            "product_name": self.product_name,
+            "upc": self.upc,
+            "l1": self.category_l1,
+            "l2": self.category_l2,
+            "l3": self.category_l3,
+            "brand": self.brand,
+            "original_country": self.original_country,
+            "current_price": self.current_price,
+            "current_stock": self.current_stock,
+            "image_link": self.image_link,
+            "product_description": self.product_description,
+            "vendor_id": self.vendor_id,
+            "sale_history_id": self.sale_history_id,
+            "history_price": self.history_price,
+        }
+        current_dict.update(self.product_unit.__dict__())
+        current_dict.update(self.attributes)
+        current_dict.update({"review": map(lambda x: x.__dict__(), self.reviews)})
+        return current_dict
 
 
 if __name__ == "__main__":
-    pass
+    d = ProductDetail.dummy()
+    print d.__dict__()
