@@ -7,14 +7,19 @@ class ProductReview(object):
         self.product_id = product_id
         self.user_id = user_id
         self.content = content
-        self.start = star
+        self.star = star
 
     @staticmethod
     def dummy():
         return ProductReview(1, 2, "hello", 5)
 
     def __dict__(self):
-        return self.__dict__
+        return {
+            "product_id": self.product_id,
+            "user_id": self.user_id,
+            "content": self.content,
+            "star": self.star
+        }
 
 
 if __name__ == "__main__":

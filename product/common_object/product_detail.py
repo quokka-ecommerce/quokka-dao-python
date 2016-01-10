@@ -93,9 +93,9 @@ class ProductDetail(object):
             "id": self._id,
             "product_name": self.product_name,
             "upc": self.upc,
-            "l1": self.category_l1,
-            "l2": self.category_l2,
-            "l3": self.category_l3,
+            "category_l1": self.category_l1,
+            "category_l2": self.category_l2,
+            "category_l3": self.category_l3,
             "brand": self.brand,
             "original_country": self.original_country,
             "current_price": self.current_price,
@@ -107,7 +107,7 @@ class ProductDetail(object):
             "history_price": self.history_price,
         }
         current_dict.update(self.product_unit.__dict__())
-        current_dict.update(self.attributes)
+        current_dict.update({"attribute": self.attributes})
         current_dict.update({"review": map(lambda x: x.__dict__(), self.reviews)})
         return current_dict
 
