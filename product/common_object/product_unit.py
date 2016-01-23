@@ -2,6 +2,12 @@
 
 from unit_type import UnitType
 
+def to_unicode(string):
+    try:
+        return string.decode("UTF-8")
+    except:
+        return string
+
 
 class ProductUnit(object):
 
@@ -32,10 +38,21 @@ class ProductUnit(object):
         dummy_number = 1
         return ProductUnit(dummy_type, dummy_number)
 
+    @staticmethod
+    def build(string_dict):
+        return ProductUnit(
+            unit_type=UnitType(to_unicode(string_dict['unit_type'])),
+            unit_number=int(string_dict['unit_number'])
+        )
+
 
 if __name__ == "__main__":
     t = UnitType.BAG
     p = ProductUnit(t, 1)
     print repr(p)
+    d = {
+        "unit_type": "盒",
+        "unit_number": "456"
+    }
 
-
+    print ProductUnit.build(d)

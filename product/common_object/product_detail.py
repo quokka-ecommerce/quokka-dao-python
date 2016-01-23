@@ -3,6 +3,14 @@
 from product_unit import ProductUnit
 from product_review import ProductReview
 
+
+def to_unicode(string):
+    try:
+        return string.decode("UTF-8")
+    except:
+        return string
+
+
 class ProductDetail(object):
 
     def __init__(self, id, product_name, upc, category_l1, category_l2, category_l3, product_unit, brand, original_country,
@@ -26,7 +34,7 @@ class ProductDetail(object):
         self.sale_history_id = sale_history_id
         self.history_price = history_price
         self.reviews = reviews
-        self.validate()
+        # self.validate()
 
     @staticmethod
     def not_none(field, field_name):
@@ -56,7 +64,7 @@ class ProductDetail(object):
             "l1", "l2", "l3",
             dummy_unit, "apple", "china", dummy_attribute,
             13.2, 12, "http://image.com", "good product",
-            123L, 234L, 345L, [dummy_review, dummy_review]
+            123L, 234L, float(1.9), [dummy_review, dummy_review]
         )
 
     def validate(self):
@@ -76,11 +84,11 @@ class ProductDetail(object):
         ProductDetail.instance_check(self._id, "id", long)
         ProductDetail.instance_check(self.vendor_id, "vendor", long)
         ProductDetail.instance_check(self.sale_history_id, "sale history", long)
-        ProductDetail.instance_check(self.history_price, "history price", long)
+        ProductDetail.instance_check(self.history_price, "history price", float)
         ProductDetail.instance_check(self.product_unit, "product_unit", ProductUnit)
-        ProductDetail.instance_check(self.category_l1, "l1 category", str)
-        ProductDetail.instance_check(self.category_l2, "l2 category", str)
-        ProductDetail.instance_check(self.category_l3, "l3 category", str)
+        ProductDetail.instance_check(self.category_l1, "l1 category", unicode)
+        ProductDetail.instance_check(self.category_l2, "l2 category", unicode)
+        ProductDetail.instance_check(self.category_l3, "l3 category", unicode)
 
 
         ProductDetail.instance_check(self.attributes, "product attributes", dict)
@@ -111,6 +119,36 @@ class ProductDetail(object):
         current_dict.update({"review": map(lambda x: x.__dict__(), self.reviews)})
         return current_dict
 
+    @staticmethod
+    def build(string_dict):
+        return ProductDetail(
+            id=long(string_dict['id']),
+            product_name=to_unicode(string_dict['product_name']),
+            upc=long(string_dict['upc']),
+            category_l1=to_unicode(string_dict['category_l1']),
+            category_l2=to_unicode(string_dict['category_l2']),
+            category_l3=to_unicode(string_dict['category_l3']),
+            product_unit=ProductUnit.build(string_dict),
+            brand=to_unicode(string_dict['brand']),
+            original_country=to_unicode(string_dict['original_country']),
+            attributes=ProductDetail.build_arrtibute(string_dict),
+            current_price=to_unicode(string_dict['current_price']),
+            current_stock=to_unicode(string_dict['current_stock']),
+            image_link=to_unicode(string_dict['image_link']),
+            product_description=to_unicode(string_dict['product_description']),
+            vendor_id=long(string_dict['vendor_id']),
+            sale_history_id=long(string_dict['sale_history_id']),
+            history_price=float(string_dict['history_price']),
+            reviews=[],
+        )
+
+    @staticmethod
+    def build_arrtibute(string_dict):
+        attribute_dict = {}
+        for key in string_dict.keys():
+            if str(key).startswith("attr_"):
+                attribute_dict[to_unicode(key)] = to_unicode(string_dict[key])
+        return attribute_dict
 
 if __name__ == "__main__":
     d = ProductDetail.dummy()

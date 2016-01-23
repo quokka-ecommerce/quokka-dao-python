@@ -5,23 +5,27 @@ from common_object.product_detail import ProductDetail
 class ProductClient(object):
     def __init__(self):
         try:
-            self.client = MongoClient("localhost", 27017)
-        except:
-            print "error in init mongo client"
+            self.client = MongoClient("52.34.52.245", 27017)
+        except Exception as e:
+            print "error in init mongo client", e
         try:
             self.db_instance = self.client['test']
-        except:
-            print "error in get db instance"
+        except Exception as e:
+            print "error in get db instance", e
         try:
             self.collection = self.db_instance['product']
-        except:
-            print "error in get db instance"
+        except Exception as e:
+            print "error in get db instance", e
 
     def is_product_existed(self, product):
         if type(product) != ProductDetail:
             raise TypeError("except ProductDetail")
         post = self.collection.find({"product_name": product.product_name})
         return (post.count() != 0)
+
+    def insert_product_detail_in_batch(self, products):
+        for product in products:
+            self.insert_product_detail(product)
 
     def insert_product_detail(self, product):
         if type(product) == ProductDetail:
