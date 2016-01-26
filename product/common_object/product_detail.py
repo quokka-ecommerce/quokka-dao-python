@@ -15,7 +15,7 @@ class ProductDetail(object):
 
     def __init__(self, id, product_name, upc, category_l1, category_l2, category_l3, product_unit, brand, original_country,
                  attributes, current_price, current_stock, image_link, product_description, vendor_id, sale_history_id,
-                 history_price, reviews):
+                 history_price, reviews, sku):
         self._id = id
         self.product_name = product_name
         self.upc = upc
@@ -34,7 +34,8 @@ class ProductDetail(object):
         self.sale_history_id = sale_history_id
         self.history_price = history_price
         self.reviews = reviews
-        # self.validate()
+        self.sku = sku
+        self.validate()
 
     @staticmethod
     def not_none(field, field_name):
@@ -64,7 +65,8 @@ class ProductDetail(object):
             "l1", "l2", "l3",
             dummy_unit, "apple", "china", dummy_attribute,
             13.2, 12, "http://image.com", "good product",
-            123L, 234L, float(1.9), [dummy_review, dummy_review]
+            123L, 234L, float(1.9), [dummy_review, dummy_review],
+            "124"
         )
 
     def validate(self):
@@ -113,6 +115,7 @@ class ProductDetail(object):
             "vendor_id": self.vendor_id,
             "sale_history_id": self.sale_history_id,
             "history_price": self.history_price,
+            "sku": self.sku
         }
         current_dict.update(self.product_unit.__dict__())
         current_dict.update({"attribute": self.attributes})
@@ -140,6 +143,7 @@ class ProductDetail(object):
             sale_history_id=long(string_dict['sale_history_id']),
             history_price=float(string_dict['history_price']),
             reviews=[],
+            sku=ProductDetail.build_sku(string_dict)
         )
 
     @staticmethod
@@ -149,6 +153,15 @@ class ProductDetail(object):
             if str(key).startswith("attr_"):
                 attribute_dict[to_unicode(key)] = to_unicode(string_dict[key])
         return attribute_dict
+
+    @staticmethod
+    def build_sku(string_dict):
+        prefix = string_dict['id']
+        for key in string_dict.keys():
+            if str(key).startswith("attr_"):
+                prefix += '_' + to_unicode(key) + '_' + string_dict[key]
+        return prefix
+
 
 if __name__ == "__main__":
     d = ProductDetail.dummy()
