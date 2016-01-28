@@ -13,7 +13,7 @@ class ProductClient(object):
         except Exception as e:
             print "error in get db instance", e
         try:
-            self.collection = self.db_instance['product']
+            self.collection = self.db_instance['Product']
         except Exception as e:
             print "error in get db instance", e
 
@@ -23,26 +23,33 @@ class ProductClient(object):
         post = self.collection.find({"product_name": product.product_name})
         return (post.count() != 0)
 
-    def insert_product_detail_in_batch(self, products):
+    def insert_product_detail_in_batch(self, products, update=False):
         for product in products:
-            self.insert_product_detail(product)
+            self.insert_product_detail(product, update)
 
-    def insert_product_detail(self, product):
+    def insert_product_detail(self, product, update=False):
         if type(product) == ProductDetail:
             if self.is_product_existed(product):
                 print "product exists"
-                return
+                if update:
+                    self.delete_product(product)
+                else:
+                    return
             post = product.__dict__()
             post_id = self.collection.insert_one(post)
-            print post_id
+            print "insert", post_id.inserted_id
+
         elif type(product) == list:
             for item in product:
                 if self.is_product_existed(item):
                     print "product exists"
-                    return
+                    if update:
+                        self.delete_product(product)
+                    else:
+                        return
                 post = item.__dict__()
                 post_id = self.collection.insert_one(post)
-                print post_id
+                print "insert", post_id.inserted_id
 
     def fetch_all_product(self):
         data_cursor = self.collection.find()
@@ -50,6 +57,10 @@ class ProductClient(object):
         for item in data_cursor:
             data.append(item)
         return data
+
+    def delete_product(self, product):
+        result = self.collection.delete_one(product.__dict__())
+        print "delete ", result.deleted_count, " records"
 
     def __del__(self):
         self.client.close()
